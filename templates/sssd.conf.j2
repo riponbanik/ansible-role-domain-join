@@ -1,0 +1,21 @@
+[sssd]
+domains = {{ ad_server.domain[0] }} 
+config_file_version = 2
+services = nss, pam
+default_domain_suffix = {{ ad_server.domain[0] }} 
+
+[domain/ad_server.domain[0]]
+ad_domain = {{ ad_server.domain[0] }} 
+krb5_realm = {{ ad_server.domain[0] | upper}} 
+realmd_tags = manages-system joined-with-samba
+cache_credentials = True
+id_provider = ad
+ad_access_filter = (|(memberOf=cn=domain\\ admins,ou=Groups,dc={{ ad_server.domain[0].split('.')[0] }},dc=ad_server.domain[0].split('.')[1]))(memberOf=ou=hadoop,dc={{ ad_server.domain[0].split('.')[0] }},dc=ad_server.domain[0].split('.')[1]))) 
+krb5_store_password_if_offline = True
+default_shell = /bin/bash
+ldap_id_mapping = True
+use_fully_qualified_names = True
+fallback_homedir = /home/%u@%d
+access_provider = ad
+
+# Configured By Ansible

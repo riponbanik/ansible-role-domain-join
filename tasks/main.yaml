@@ -1,0 +1,76 @@
+---
+- name: Installing Required packages
+  yum: 
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ pkgs }}"
+
+# - name: Updating resolv.conf 
+#   template: src=resolv.conf.j2 dest=/etc/resolv.conf
+
+- name: Sync time with AD
+  shell: systemctl stop ntpd ; ntpdate {{ ad_server.ip }} && systemctl start ntpd
+  register: timesync_result
+  changed_when: false
+
+- name: Install pexpect using pip
+  pip:
+    name: pexpect
+
+- name: Checking Domain Join status
+  shell: /bin/bash -c "/usr/sbin/realm discover {{ ad_server.domain }} | grep -q sssd"
+  register: ad_status
+  changed_when: false
+  ignore_errors: true
+
+
+- name: Join linux into domain
+  expect:
+      command: /bin/bash -c "/usr/sbin/realm join {{ ad_server.domain }} --user={{ ad_server.user }}"
+      responses:
+          Password.*: "{{ ad_server.pass }}"
+  when: ad_status.rc != 0
+
+# - name: Configure SSSD 
+#   template: src=sssd.conf.j2 dest=/etc/sssd/sssd.conf
+#   notify: 
+#     - restart sssd
+
+# - name: Configure krb5.conf
+#   template: src=krb5.conf.j2 dest=/etc/krb5.conf
+
+- name: Allow User Login without FQDN
+  lineinfile: 
+     backup: yes
+     state: present
+     dest: /etc/sssd/sssd.conf
+     regexp: '^{{ item.search }}'
+     line: '{{ item.replace }}'
+  with_items:
+      - { search: 'use_fully_qualified_names', replace: 'use_fully_qualified_names = False' }
+      - { search: 'fallback_homedir', replace: 'fallback_homedir = /home/%u' }
+    
+  notify:
+      - restart sssd
+
+- name: Allow Password Auth for all users except root
+  lineinfile: 
+     backup: yes
+     state: present
+     dest: /etc/ssh/sshd_config
+     regexp: '^{{ item.search }}'
+     line: '{{ item.replace }}'
+  with_items:
+      # - { search: 'PermitRootLogin', replace: 'PermitRootLogin no' }
+      - { search: 'PasswordAuthentication', replace: 'PasswordAuthentication yes' }
+      # - { search: 'GSSAPIAuthentication', replace: 'GSSAPIAuthentication yes' }
+  notify:
+      - restart sshd
+
+- name: Updating sudors for Domain Admins users
+  lineinfile: 
+     path: /etc/sudoers
+     state: present
+     regexp: '^%domain\\ admins'
+     line: '%domain\ admins ALL=(ALL:ALL) ALL'
+     validate: 'visudo -cf %s'
