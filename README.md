@@ -50,8 +50,8 @@ ssh __user_name__@localhost
 ```
 
 ## Leaving the domain
-If you want to reverse the process and remove yourself from the domain, simply run the ‘realm leave’ command followed by the domain name, as shown below.
-`realm leave example.com`
+If you want to reverse the process and remove yourself from the domain, simply run the ‘realm leave’ command followed by the domain name, as shown below. <br/>
+realm leave example.com
 
 
 
