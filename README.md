@@ -1,4 +1,4 @@
-# ansible_snmpd
+# domain_join
 Automate Linux Machine join AD using Ansible. This module is inspired from the work of 
   * https://github.com/rahulinux/ansible-domain-join 
 Domain Administrators  default group is configured to enable sudo 
@@ -43,9 +43,11 @@ Create ad.yaml file with the content below and include it into the plyabook. Mak
 ```
 
 ## Testing 
+```
 sudo realm list
-id user_name
-ssh user_name@localhost
+id *user_name*
+ssh *user_name*@localhost
+```
 
 ## Leaving the domain
 If you want to reverse the process and remove yourself from the domain, simply run the ‘realm leave’ command followed by the domain name, as shown below.
