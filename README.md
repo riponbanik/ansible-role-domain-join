@@ -41,6 +41,7 @@ Create ad.yaml file with the content below and include it into the plyabook. Mak
     pass: 'xxxx'
     domain: example.com
 ```
+Modify ou_membership to add the machine to custom OU
 
 ## Testing 
 ```

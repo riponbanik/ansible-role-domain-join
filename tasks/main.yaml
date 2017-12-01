@@ -23,7 +23,7 @@
 
 - name: Join linux into domain
   expect:
-      command: /bin/bash -c "/usr/sbin/realm join {{ ad_server.domain }} --user={{ ad_server.user }}"
+      command: /bin/bash -c "/usr/sbin/realm join {{ ad_server.domain }} --user={{ ad_server.user }} --computer-ou={{ ou_membership }}"
       responses:
           Password.*: "{{ ad_server.pass }}"
   when: ad_status.rc != 0

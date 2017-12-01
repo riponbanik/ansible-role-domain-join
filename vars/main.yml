@@ -12,3 +12,5 @@ pkgs:
   - ntp
   - ntpdate
   - python-pip
+
+ou_membership: OU=Computers,DC=example,DC=com
