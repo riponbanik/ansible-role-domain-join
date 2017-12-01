@@ -45,13 +45,13 @@ Create ad.yaml file with the content below and include it into the plyabook. Mak
 ## Testing 
 ```
 sudo realm list
-id *user_name*
-ssh *user_name*@localhost
+id __user_name__
+ssh __user_name__@localhost
 ```
 
 ## Leaving the domain
 If you want to reverse the process and remove yourself from the domain, simply run the ‘realm leave’ command followed by the domain name, as shown below.
-realm leave example.com
+`realm leave example.com`
 
 
 
