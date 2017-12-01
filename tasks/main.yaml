@@ -5,9 +5,6 @@
     state: installed
   with_items: "{{ pkgs }}"
 
-# - name: Updating resolv.conf 
-#   template: src=resolv.conf.j2 dest=/etc/resolv.conf
-
 - name: Sync time with AD
   shell: systemctl stop ntpd ; ntpdate {{ ad_server.ip }} && systemctl start ntpd
   register: timesync_result
@@ -31,14 +28,6 @@
           Password.*: "{{ ad_server.pass }}"
   when: ad_status.rc != 0
 
-# - name: Configure SSSD 
-#   template: src=sssd.conf.j2 dest=/etc/sssd/sssd.conf
-#   notify: 
-#     - restart sssd
-
-# - name: Configure krb5.conf
-#   template: src=krb5.conf.j2 dest=/etc/krb5.conf
-
 - name: Allow User Login without FQDN
   lineinfile: 
      backup: yes
@@ -60,10 +49,9 @@
      dest: /etc/ssh/sshd_config
      regexp: '^{{ item.search }}'
      line: '{{ item.replace }}'
-  with_items:
-      # - { search: 'PermitRootLogin', replace: 'PermitRootLogin no' }
+  with_items:      
       - { search: 'PasswordAuthentication', replace: 'PasswordAuthentication yes' }
-      # - { search: 'GSSAPIAuthentication', replace: 'GSSAPIAuthentication yes' }
+      
   notify:
       - restart sshd
 
